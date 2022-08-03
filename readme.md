@@ -24,6 +24,12 @@ __Bonus:__ add a `statistics` endpoint allowing users to know what the most freq
 
 ## Launch
 
+__with docker:__
+```sh
+docker compose up
+```
+
+__without Docker:__
 ```sh
 make server
 ```
