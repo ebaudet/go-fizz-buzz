@@ -12,6 +12,16 @@ BOLD = "\e[1m"
 server:
 	go run main.go
 
+start_postgres:
+	docker start pg_fizzbuzz
+
+stop_postgres:
+	docker stop pg_fizzbuzz
+
+fclean: start_postgres dropdb
+	docker stop pg_fizzbuzz
+	docker rm pg_fizzbuzz
+
 test:
 	go test -v -cover ./...
 
@@ -63,6 +73,9 @@ help:
 	@printf $(YELLOW)$(BOLD)"HELP\n--------------------\n"$(NORMAL)
 	@printf $(NORMAL)"-> make "$(BOLD)"server"$(NORMAL)": launches the server\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"test"$(NORMAL)": runs all the tests\n"
+	@printf $(NORMAL)"-> make "$(BOLD)"start_postgres"$(NORMAL)": starts database container\n"
+	@printf $(NORMAL)"-> make "$(BOLD)"stop_postgres"$(NORMAL)": stops database container\n"
+	@printf $(NORMAL)"-> make "$(BOLD)"fclean"$(NORMAL)": removes database\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"test_nocache"$(NORMAL)": runs all the tests without caching\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"new_migration [-e NAME=<migration_name>]"$(NORMAL)": creates a new migration file\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"migrateup"$(NORMAL)": migrates all the pending migrations\n"
@@ -80,4 +93,4 @@ help:
 
 usage: help
 
-.PHONY: server test test_nocache help usage postgres createdb dropdb new_migration migrateup migrateup1 migratedown migratedown1 sqlc psql mock
+.PHONY: server test test_nocache help usage postgres createdb dropdb new_migration migrateup migrateup1 migratedown migratedown1 sqlc psql mock fclean start_postgres stop_postgres

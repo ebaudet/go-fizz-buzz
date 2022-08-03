@@ -30,10 +30,19 @@ docker compose up
 ```
 
 __without Docker:__
+1st time:
 ```sh
+make postgres
+make createdb
+make migrateup
+
 make server
 ```
-
+then:
+```sh
+make start_postgres
+make server
+```
 ℹ️ To get more infos about the makefile commands
 
 ```sh
@@ -43,6 +52,13 @@ make help
 Then it's possible to explore the API with [Postman](https://www.postman.com/) importing the following tests :
 `postman/fizzbuzz.postman_collection.json`
 
+## Remove
+
+⚠️ remove the database created:
+```sh
+make fclean
+```
+
 ## Tests
 
 You launch the tests with the following command:
@@ -50,3 +66,9 @@ You launch the tests with the following command:
 ```sh
 make test
 ```
+
+## Development
+
+* To update the database schema, create a new migration with `make new_migration` then apply your migration with `make migrateup1` - [see migrate documentation](https://pkg.go.dev/github.com/golang-migrate/migrate)
+* For new sql request, edit the `/db/query` part, then generate the code with `make sqlc` - [see sqlc documentation](https://docs.sqlc.dev/en/latest/index.html)
+* Update the mock to test database interface with `make mock` - [see mock documentation](https://github.com/golang/mock)
