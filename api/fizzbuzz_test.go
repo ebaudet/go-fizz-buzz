@@ -5,14 +5,14 @@ import (
 	"database/sql"
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	mockdb "github.com/ebaudet/go-fizz-buzz/db/mock"
 	db "github.com/ebaudet/go-fizz-buzz/db/sqlc"
-	"github.com/ebaudet/go-fizz-buzz/util"
 	"github.com/gin-gonic/gin"
+	"github.com/golang/mock/gomock"
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/require"
 )
@@ -21,6 +21,7 @@ func TestGetFizzBuzz(t *testing.T) {
 	testCases := []struct {
 		name          string
 		body          gin.H
+		buildStubs    func(store *mockdb.MockStore)
 		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
 	}{
 		{
@@ -32,6 +33,9 @@ func TestGetFizzBuzz(t *testing.T) {
 				"str1":  "Fizz",
 				"str2":  "Buzz",
 			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().IncrementRequest(gomock.Any(), gomock.Any()).Times(1)
+			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
 				requireBodyMatchString(t, recorder.Body, "\"1,2,Fizz,4,Buzz,Fizz,7,8,Fizz,Buzz,11,Fizz,13,14,FizzBuzz,16.\"")
@@ -40,6 +44,9 @@ func TestGetFizzBuzz(t *testing.T) {
 		{
 			name: "BadRequest",
 			body: gin.H{},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().IncrementRequest(gomock.Any(), gomock.Any()).Times(0)
+			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
 			},
@@ -52,6 +59,9 @@ func TestGetFizzBuzz(t *testing.T) {
 				"limit": 16,
 				"str1":  "Fizz",
 				"str2":  "Buzz",
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().IncrementRequest(gomock.Any(), gomock.Any()).Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
@@ -66,6 +76,9 @@ func TestGetFizzBuzz(t *testing.T) {
 				"str1":  "Fizz",
 				"str2":  "Buzz",
 			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().IncrementRequest(gomock.Any(), gomock.Any()).Times(0)
+			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
 			},
@@ -78,6 +91,9 @@ func TestGetFizzBuzz(t *testing.T) {
 				"limit": 0,
 				"str1":  "Fizz",
 				"str2":  "Buzz",
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().IncrementRequest(gomock.Any(), gomock.Any()).Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
@@ -92,6 +108,9 @@ func TestGetFizzBuzz(t *testing.T) {
 				"str1":  "Fizz",
 				"str2":  "Buzz",
 			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().IncrementRequest(gomock.Any(), gomock.Any()).Times(0)
+			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
 			},
@@ -103,6 +122,9 @@ func TestGetFizzBuzz(t *testing.T) {
 				"int2":  5,
 				"limit": 16,
 				"str2":  "Buzz",
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().IncrementRequest(gomock.Any(), gomock.Any()).Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
@@ -116,8 +138,27 @@ func TestGetFizzBuzz(t *testing.T) {
 				"limit": 16,
 				"str1":  "Fizz",
 			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().IncrementRequest(gomock.Any(), gomock.Any()).Times(0)
+			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name: "InternalError",
+			body: gin.H{
+				"int1":  3,
+				"int2":  5,
+				"limit": 16,
+				"str1":  "Fizz",
+				"str2":  "Buzz",
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().IncrementRequest(gomock.Any(), gomock.Any()).Times(1).Return(db.FizzbuzzStatistic{}, sql.ErrTxDone)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
 			},
 		},
 	}
@@ -126,18 +167,11 @@ func TestGetFizzBuzz(t *testing.T) {
 		tc := testCases[i]
 
 		t.Run(tc.name, func(t *testing.T) {
-			config, err := util.LoadConfig("..")
-			if err != nil {
-				log.Fatal("cannot load config:", err)
-			}
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
 
-			conn, err := sql.Open(config.DBDriver, config.DBSource)
-			if err != nil {
-				log.Fatal("cannot connect to database: ", err)
-			}
-
-			store := db.NewStore(conn)
-
+			store := mockdb.NewMockStore(ctrl)
+			tc.buildStubs(store)
 			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 

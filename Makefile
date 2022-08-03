@@ -56,6 +56,9 @@ migratedown1:
 sqlc:
 	sqlc generate
 
+mock:
+	mockgen -destination db/mock/store.go -build_flags=--mod=mod -package mockdb github.com/ebaudet/go-fizz-buzz/db/sqlc Store
+
 help:
 	@printf $(YELLOW)$(BOLD)"HELP\n--------------------\n"$(NORMAL)
 	@printf $(NORMAL)"-> make "$(BOLD)"server"$(NORMAL)": launches the server\n"
@@ -67,6 +70,7 @@ help:
 	@printf $(NORMAL)"-> make "$(BOLD)"migrateup1"$(NORMAL)": migrates the next migration\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"migratedown1"$(NORMAL)": rolldowns the last migration\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"sqlc"$(NORMAL)": generates sqlc file as defined in sqlc.yaml\n"
+	@printf $(NORMAL)"-> make "$(BOLD)"mock"$(NORMAL)": generates mocks file for database tests\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"postgres"$(NORMAL)": runs the docker postgres14 container\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"createdb"$(NORMAL)": creates the database on docker postres container\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"dropdb"$(NORMAL)": drop the database on docker postres container\n"
@@ -76,4 +80,4 @@ help:
 
 usage: help
 
-.PHONY: server test test_nocache help usage postgres createdb dropdb new_migration migrateup migrateup1 migratedown migratedown1 sqlc psql
+.PHONY: server test test_nocache help usage postgres createdb dropdb new_migration migrateup migrateup1 migratedown migratedown1 sqlc psql mock

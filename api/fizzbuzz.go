@@ -48,7 +48,11 @@ func (server *Server) fizzBuzz(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	server.store.IncrementRequest(ctx, json_request)
+	_, err = server.store.IncrementRequest(ctx, json_request)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 
 	ctx.JSON(200, output)
 }
