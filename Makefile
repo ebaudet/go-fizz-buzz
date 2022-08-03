@@ -35,6 +35,9 @@ postgres:
 createdb:
 	docker exec -it pg_fizzbuzz createdb --username=root --owner=root fizzbuzz
 
+psql:
+	docker exec -it pg_fizzbuzz psql -U root -d fizzbuzz
+
 dropdb:
 	docker exec -it pg_fizzbuzz dropdb fizzbuzz
 
@@ -50,6 +53,9 @@ migratedown:
 migratedown1:
 	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/fizzbuzz?sslmode=disable" -verbose down 1
 
+sqlc:
+	sqlc generate
+
 help:
 	@printf $(YELLOW)$(BOLD)"HELP\n--------------------\n"$(NORMAL)
 	@printf $(NORMAL)"-> make "$(BOLD)"server"$(NORMAL)": launches the server\n"
@@ -60,12 +66,14 @@ help:
 	@printf $(NORMAL)"-> make "$(BOLD)"migratedown"$(NORMAL)": rolldowns all the migrations\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"migrateup1"$(NORMAL)": migrates the next migration\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"migratedown1"$(NORMAL)": rolldowns the last migration\n"
+	@printf $(NORMAL)"-> make "$(BOLD)"sqlc"$(NORMAL)": generates sqlc file as defined in sqlc.yaml\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"postgres"$(NORMAL)": runs the docker postgres14 container\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"createdb"$(NORMAL)": creates the database on docker postres container\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"dropdb"$(NORMAL)": drop the database on docker postres container\n"
+	@printf $(NORMAL)"-> make "$(BOLD)"psql"$(NORMAL)": launches psql inside docker container\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"help | usage"$(NORMAL)": shows the help\n"
 	@printf $(YELLOW)$(BOLD)"--------------------\n"$(NORMAL)
 
 usage: help
 
-.PHONY: server test test_nocache help usage postgres createdb dropdb new_migration migrateup migrateup1 migratedown migratedown1
+.PHONY: server test test_nocache help usage postgres createdb dropdb new_migration migrateup migrateup1 migratedown migratedown1 sqlc psql

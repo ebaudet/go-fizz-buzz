@@ -6,6 +6,8 @@ import "github.com/spf13/viper"
 // The values are read by viper form a config file or environment variables.
 type Config struct {
 	ServerAddress string `mapstructure:"SERVER_ADDRESS"`
+	DBDriver      string `mapstructure:"DB_DRIVER"`
+	DBSource      string `mapstructure:"DB_SOURCE"`
 }
 
 // LoadConfig reads configuration from file or environment variables.
