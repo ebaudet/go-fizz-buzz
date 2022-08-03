@@ -1,15 +1,19 @@
 package api
 
-import "github.com/gin-gonic/gin"
+import (
+	db "github.com/ebaudet/go-fizz-buzz/db/sqlc"
+	"github.com/gin-gonic/gin"
+)
 
 // Server serves HTTP requests for our service
 type Server struct {
+	store  *db.Store
 	router *gin.Engine
 }
 
-func NewServer() *Server {
+func NewServer(store *db.Store) *Server {
 	server := &Server{
-		router: gin.Default(),
+		store: store,
 	}
 
 	server.setupRouter()
@@ -22,6 +26,7 @@ func (server *Server) setupRouter() {
 	router := gin.Default()
 
 	router.GET("/fizzbuzz", server.fizzBuzz)
+	router.GET("/statistics", server.statistics)
 
 	server.router = router
 }

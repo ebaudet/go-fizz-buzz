@@ -35,6 +35,24 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "localhost:8080/statistics",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/statistics",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"statistics"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }

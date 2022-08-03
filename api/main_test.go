@@ -4,11 +4,12 @@ import (
 	"os"
 	"testing"
 
+	db "github.com/ebaudet/go-fizz-buzz/db/sqlc"
 	"github.com/gin-gonic/gin"
 )
 
-func newTestServer(t *testing.T) *Server {
-	server := NewServer()
+func newTestServer(t *testing.T, store *db.Store) *Server {
+	server := NewServer(store)
 	return server
 }
 

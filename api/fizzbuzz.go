@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"net/http"
 	"strings"
 
@@ -41,6 +42,13 @@ func (server *Server) fizzBuzz(ctx *gin.Context) {
 	}
 
 	output := strings.Join(arrayString, ",") + "."
+
+	json_request, err := json.Marshal(request)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	server.store.IncrementRequest(ctx, json_request)
 
 	ctx.JSON(200, output)
 }

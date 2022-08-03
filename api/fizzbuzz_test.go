@@ -2,13 +2,18 @@ package api
 
 import (
 	"bytes"
+	"database/sql"
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	db "github.com/ebaudet/go-fizz-buzz/db/sqlc"
+	"github.com/ebaudet/go-fizz-buzz/util"
 	"github.com/gin-gonic/gin"
+	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/require"
 )
 
@@ -121,7 +126,19 @@ func TestGetFizzBuzz(t *testing.T) {
 		tc := testCases[i]
 
 		t.Run(tc.name, func(t *testing.T) {
-			server := newTestServer(t)
+			config, err := util.LoadConfig("..")
+			if err != nil {
+				log.Fatal("cannot load config:", err)
+			}
+
+			conn, err := sql.Open(config.DBDriver, config.DBSource)
+			if err != nil {
+				log.Fatal("cannot connect to database: ", err)
+			}
+
+			store := db.NewStore(conn)
+
+			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
 			data, err := json.Marshal(tc.body)
