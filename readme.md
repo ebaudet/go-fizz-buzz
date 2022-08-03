@@ -6,7 +6,7 @@
 
 The original fizz-buzz consists in writing all numbers from 1 to 100, and just replacing all multiples of 3 by `fizz`, all multiples of 5 by `buzz`, and all multiples of 15 by `fizzbuzz`.
 
-The output would look like this: `1,2,fizz,4,buzz,fizz,7,8,fizz,buzz,11,fizz,13,14,fizzbuzz,16,... .`
+The output would look like this: `"1,2,fizz,4,buzz,fizz,7,8,fizz,buzz,11,fizz,13,14,fizzbuzz,16,...,buzz."`
 
 ----
 
@@ -26,6 +26,12 @@ __Bonus:__ add a `statistics` endpoint allowing users to know what the most freq
 
 ```sh
 make server
+```
+
+ℹ️ To get more infos about the makefile commands
+
+```sh
+make help
 ```
 
 Then it's possible to explore the API with [Postman](https://www.postman.com/) importing the following tests :
