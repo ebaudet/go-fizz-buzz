@@ -27,3 +27,6 @@ __Bonus:__ add a `statistics` endpoint allowing users to know what the most freq
 ```sh
 make server
 ```
+
+Then it's possible to explore the API with [Postman](https://www.postman.com/) importing the following tests :
+`postman/fizzbuzz.postman_collection.json`

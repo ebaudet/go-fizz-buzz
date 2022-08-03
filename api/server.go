@@ -12,7 +12,18 @@ func NewServer() *Server {
 		router: gin.Default(),
 	}
 
+	server.setupRouter()
+
 	return server
+}
+
+// Define all the api's routes here
+func (server *Server) setupRouter() {
+	router := gin.Default()
+
+	router.GET("/fizzbuzz", server.fizzBuzz)
+
+	server.router = router
 }
 
 func (server *Server) Start(address string) error {
