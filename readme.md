@@ -30,3 +30,11 @@ make server
 
 Then it's possible to explore the API with [Postman](https://www.postman.com/) importing the following tests :
 `postman/fizzbuzz.postman_collection.json`
+
+## Tests
+
+You launch the tests with the following command:
+
+```sh
+make test
+```

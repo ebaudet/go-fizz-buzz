@@ -9,8 +9,8 @@ import (
 )
 
 type fizzBuzzRequest struct {
-	Int1  int    `json:"int1" binding:"required,min=1"`
-	Int2  int    `json:"int2" binding:"required,min=1"`
+	Int1  int    `json:"int1" binding:"min=1"`
+	Int2  int    `json:"int2" binding:"min=1"`
 	Limit int    `json:"limit" binding:"min=1,max=1000000"`
 	Str1  string `json:"str1" binding:"required"`
 	Str2  string `json:"str2" binding:"required"`
