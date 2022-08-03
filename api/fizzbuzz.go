@@ -32,7 +32,12 @@ func (server *Server) fizzBuzz(ctx *gin.Context) {
 
 	var arrayString []string
 	for i := 1; i <= request.Limit; i++ {
-		arrayString = append(arrayString, util.FizzBuzz(i, f))
+		res, err := util.FizzBuzz(i, f)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+		arrayString = append(arrayString, res)
 	}
 
 	output := strings.Join(arrayString, ",") + "."

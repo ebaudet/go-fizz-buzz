@@ -1,6 +1,9 @@
 package util
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 type FizzParams struct {
 	Int1 int
@@ -9,8 +12,15 @@ type FizzParams struct {
 	Str2 string
 }
 
-func FizzBuzz(i int, f FizzParams) string {
+func FizzBuzz(i int, f FizzParams) (string, error) {
 	var output string
+
+	if f.Int1 == 0 {
+		return "", errors.New("int1 cannot be 0")
+	}
+	if f.Int2 == 0 {
+		return "", errors.New("int2 cannot be 0")
+	}
 
 	if i%f.Int1 == 0 {
 		output += f.Str1
@@ -21,5 +31,5 @@ func FizzBuzz(i int, f FizzParams) string {
 	if output == "" {
 		output = fmt.Sprintf("%d", i)
 	}
-	return output
+	return output, nil
 }
