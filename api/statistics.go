@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
 
@@ -23,6 +24,10 @@ func newStatisticResponse(data db.FizzbuzzStatistic) statisticResponse {
 func (server *Server) statistics(ctx *gin.Context) {
 	fizz_stat, err := server.store.GetMostUsedRequest(ctx)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusOK, statisticResponse{})
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
